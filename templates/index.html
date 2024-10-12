@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Simulator</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #333;
+            color: #00ff00;
+            padding: 20px;
+        }
+        #terminal {
+            border: 2px solid #00ff00;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: black;
+        }
+        #input {
+            width: 100%;
+            background-color: black;
+            color: #00ff00;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+    <input type="text" id="input" autofocus onkeypress="handleInput(event)">
+    
+    <script>
+        const terminal = document.getElementById("terminal");
+        const inputField = document.getElementById("input");
+
+        function handleInput(event) {
+            if (event.key === "Enter") {
+                const input = inputField.value;
+                terminal.innerHTML += `<p>> ${input}</p>`;
+                inputField.value = "";
+
+                fetch('/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: input })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    terminal.innerHTML += `<p>${data.output}</p>`;
+                    terminal.scrollTop = terminal.scrollHeight; // Scroll to bottom
+                });
+            }
+        }
+    </script>
+</body>
+</html>
